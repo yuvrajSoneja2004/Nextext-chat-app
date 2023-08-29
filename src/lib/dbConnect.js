@@ -1,0 +1,1 @@
+export const connectionURI = `mongodb+srv://yuvrajdev20004:fullstackdev69@cluster0.lzuxbyk.mongodb.net/?retryWrites=true&w=majority`;
