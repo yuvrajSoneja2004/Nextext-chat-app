@@ -4,53 +4,48 @@ import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 const bcrypt = require("bcrypt")
 
-// Register
+// Login
 export async function POST (req , res){
    
     try {
         let body = await req.json();
-       const conn =  await mongoose.connect(connectionURI);
+        await mongoose.connect(connectionURI);
         console.log("Suceess");
         console.log("the boody" , body)
 
         
             // Checking if the username already exists in db
         const checkUserName = await UsersModel.findOne({userName: body.userName});
-        if(checkUserName){
+        if(!checkUserName){
             return NextResponse.json({
-                msg: "User with this username already exists",
+                msg: "Invalid username or password",
                 res: false
             } , {status: 404})
         }
         // Checking if the username already exists in db
-        const checkUserEmail = await UsersModel.findOne({userEmail: body.userEmail});
-        if(checkUserEmail){
+        const checkUserPass = await UsersModel.findOne({userEmail: body.userPassword});
+        if(!checkUserPass){
             return NextResponse.json({
-                msg: "User with this email already exists",
+                msg: "Invalid email for password",
                 res: false
             } , {status: 404})
         }
-        if(!checkUserEmail && !checkUserName){
-            const hashedPassword = await bcrypt.hash(body.userPassword, 10)
-            const newUser = await UsersModel.create({
-                userName: body.userName,
-                userEmail: body.userEmail,
-                userPass: hashedPassword
-            });
-            // delete body.userPassword;
+        if(checkUserName && checkUserPass){
+            const hashedPassword = await bcrypt.compare(body.userPassword, checkUserPass.userPass);
+           if(hashedPassword){
+            return NextResponse.json({
+                msg: `Operation Successful. Hey!`,
+                res: true
+            })
+           }
+            delete body.userPassword;
             return NextResponse.json({
                 msg: ":(",
                 res: false
             })
         }
         
-
-
-
-        return NextResponse.json({
-            msg: "Successfully created resource in db",
-            res: true
-        }, {status: 200})
+       
     } catch (error) {
         console.log("Error" + error)
     }

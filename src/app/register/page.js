@@ -6,11 +6,11 @@ import styled from 'styled-components';
 import Logo from '../../assets/logo.svg'
 import Link from 'next/link';
 import axios from 'axios'
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 
 function page() {
-    // const router = useRouter();
+    const router = useRouter();
 
     // 1 .Defining user state variable
     const [userData, setUserData] = useState({
@@ -39,23 +39,21 @@ function page() {
             if(userData.userpass != userData.userconformpass){
                 alert("Conform password and user pass does'nt match")
             } else {
-               let res =  await axios.post("/api/register" , {
+               let { data } =  await axios.post("/api/register" , {
                     userName: userData.username,
                     userEmail: userData.useremail,
                     userPassword: userData.userpass
                 })
 
-                if(res?.data?.res){
-                    alert('Successfly registered');
-                    localStorage.setItem("user-data" , JSON.stringify(res?.data?.users))
-                    // router.push("/")
+                if(data.res != undefined){
+                    // alert('Successfly registered');
+                    localStorage.setItem("user-data" , JSON.stringify(data?.res))
+                    router.push("/")
                 } 
                  
             }
         } catch (error) {
-            if(!error?.response?.data?.res)
-            alert(error?.response?.data?.msg);
-        console.log(error)
+            console.log(error , 'error man')
         }
     }
     return (

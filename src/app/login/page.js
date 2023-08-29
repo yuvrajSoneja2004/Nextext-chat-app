@@ -5,6 +5,7 @@ import React, { useState } from 'react'
 import styled from 'styled-components';
 import Logo from '../../assets/logo.svg'
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 function page() {
     // 1 .Defining user state variable
@@ -14,7 +15,7 @@ function page() {
     })
 
 
-
+//login
     // 2. Function to handle user inputs
     const handleInputChange = (event) => {
         const { name, value } = event.target;
@@ -23,13 +24,36 @@ function page() {
             [name]: value
         }));
     };
+
+
+     // 3 > Handling Submit
+     const handleSubmit = async (e) => {
+        try {
+               let { data } =  await axios.post("/api/login" , {
+                    userName: userData.username,
+                    userPassword: userData.userpass
+                })
+                console.log(data , 'login data men')
+
+                if(data.res != undefined){
+                    // alert('Successfly registered');
+                    localStorage.setItem("user-data" , JSON.stringify(data?.res))
+                    router.push("/")
+                } 
+                 
+            
+        } catch (error) {
+            console.log(error , 'error man')
+        }
+    }
+
     return (
         <Whole>
             <Box>
                 <Image src={Logo} width={100} height={100} />
-                <input type="text" placeholder='Username' name='username' value={userData.username} onChange={handleInputChange} />
-                <input type="password" placeholder='Password' name='userpass' value={userData.userpass} onChange={handleInputChange} />
-                <button>Login</button>
+                <input type="text" placeholder='Username' name='username' value={userData.username} onChange={handleInputChange} required />
+                <input type="password" placeholder='Password' name='userpass' value={userData.userpass} onChange={handleInputChange} required />
+                <button onClick={handleSubmit}>Login</button>
                 <p>Don't have an acocunt gareeb sala? <Link href="/register">Click here</Link></p>
             </Box>
         </Whole>
